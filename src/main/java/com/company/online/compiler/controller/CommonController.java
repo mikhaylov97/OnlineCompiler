@@ -34,9 +34,10 @@ public class CommonController {
     }
 
     @RequestMapping(value = "/compile", method = RequestMethod.POST)
-    public ModelAndView compileCodeAndGetResultPage(@RequestParam(name = "code") String code) {
+    public ModelAndView compileCodeAndGetResultPage(@RequestParam(name = "code") String code,
+                                                    @RequestParam(name = "input-params") String inputParams) {
         ModelAndView result = new ModelAndView("result");
-        result.addObject("compilationResult", compileService.compileCode(code));
+        result.addObject("compilationResult", compileService.compileCode(code, inputParams));
 
         return result;
     }

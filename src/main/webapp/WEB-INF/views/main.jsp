@@ -14,6 +14,9 @@
         <div class="code-area">
             <textarea name="code" cols="100" rows="35" placeholder="Enter your code..." ></textarea>
         </div>
+        <div class="input-params">
+            <textarea name="input-params" cols="100" rows="15" placeholder="Put here input params..."></textarea>
+        </div>
         <input type="submit" value="Compile">
     </form>
 </div>

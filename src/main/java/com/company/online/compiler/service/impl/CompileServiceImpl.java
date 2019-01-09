@@ -4,6 +4,10 @@ import com.company.online.compiler.service.api.CompileService;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 
 import static java.io.File.separator;
 
@@ -48,11 +52,11 @@ public class CompileServiceImpl implements CompileService {
     private static final String ADDITIONAL_COMMAND = "-cp";
     private static final String SPACE = " ";
 
-    private static final String JAVAC_COMPILING_COMMAND = JAVAC_COMMAND + SPACE + ADDITIONAL_COMMAND + SPACE + CLASSES_DIR_ABSOLUTE_PATH + CLASS_NAME + JAVA_EXTENSION;
+    private static final String JAVAC_COMPILING_COMMAND = JAVAC_COMMAND + SPACE + CLASSES_DIR_ABSOLUTE_PATH + CLASS_NAME + JAVA_EXTENSION;
     private static final String JAVA_RUN_COMMAND = JAVA_COMMAND + SPACE + ADDITIONAL_COMMAND + SPACE + CLASSES_DIR_ABSOLUTE_PATH + SPACE + CLASS_NAME;
 
     @Override
-    public String compileCode(String code) {
+    public String compileCode(String code, String inputParams) {
         if (!CLASSES_DIR.exists()) {
             CLASSES_DIR.mkdirs();
         }
@@ -66,18 +70,43 @@ public class CompileServiceImpl implements CompileService {
 
         try {
             Process compileProcess = Runtime.getRuntime().exec(JAVAC_COMPILING_COMMAND);
+            String compileErrors = printLines(compileProcess.getErrorStream());
             compileProcess.waitFor();
+            if (!compileErrors.isEmpty()) {
+                clearDirectory();
+                return compileErrors;
+            }
 
+            List<String> inputParameters = prepareInputParameters(inputParams);
             Process runProcess = Runtime.getRuntime().exec(JAVA_RUN_COMMAND);
-            String compilingResult = printLines(runProcess.getInputStream());
+            OutputStream outputStream = runProcess.getOutputStream();
+            for (String parameter : inputParameters) {
+                outputStream.write((parameter + System.lineSeparator()).getBytes());
+                outputStream.flush();
+            }
+            outputStream.close();
+
+            String runErrors = printLines(runProcess.getErrorStream());
+            if (!runErrors.isEmpty()) {
+                runProcess.waitFor();
+                clearDirectory();
+
+                return runErrors;
+            }
+
+            String runResult = printLines(runProcess.getInputStream());
             runProcess.waitFor();
 
             clearDirectory();
 
-            return compilingResult;
+            return runResult;
         } catch (Exception e) {
             return "Something was wrong during compiling code.";
         }
+    }
+
+    private List<String> prepareInputParameters(String inputParameters) {
+        return Arrays.asList(inputParameters.split(System.lineSeparator()));
     }
 
     private void clearDirectory() {
@@ -95,6 +124,7 @@ public class CompileServiceImpl implements CompileService {
         while ((line = in.readLine()) != null) {
             result.append(line).append(System.lineSeparator());
         }
+        in.close();
 
         return result.toString();
     }
