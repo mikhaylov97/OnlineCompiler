@@ -7,7 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Unsecured controller for all users(means guests, admins and super-admins) while them unauthorised.
@@ -34,11 +34,9 @@ public class CommonController {
     }
 
     @RequestMapping(value = "/compile", method = RequestMethod.POST)
-    public ModelAndView compileCodeAndGetResultPage(@RequestParam(name = "code") String code,
+    @ResponseBody
+    public String compileCodeAndGetResultPage(@RequestParam(name = "code") String code,
                                                     @RequestParam(name = "input-params") String inputParams) {
-        ModelAndView result = new ModelAndView("result");
-        result.addObject("compilationResult", compileService.compileCode(code, inputParams));
-
-        return result;
+        return compileService.compileCode(code, inputParams);
     }
 }
