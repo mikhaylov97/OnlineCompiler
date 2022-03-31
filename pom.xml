@@ -8,7 +8,7 @@
     <artifactId>online-compiler</artifactId>
     <version>1.0-SNAPSHOT</version>
     <properties>
-        <spring.version>4.3.9.RELEASE</spring.version>
+        <spring.version>5.3.18</spring.version>
         <spring-security-web.version>4.2.3.RELEASE</spring-security-web.version>
         <spring-security-core.version>4.2.3.RELEASE</spring-security-core.version>
         <spring-security-config.version>4.2.3.RELEASE</spring-security-config.version>
